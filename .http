@@ -7,15 +7,15 @@ POST http://localhost:5000/declarations
 Content-Type: application/json
 
 {
-  "title": "Название объявления",
-  "description": "Описание объявления",
-  "author": "Автор объявления",
-  "created_at": "Дата создания"
+  "title": "Продается марка почтовая",
+  "description": "Марка почтовая 1905 года выпуска",
+  "author": "Ленчик",
+  "created_at": "02.06.2023"
 }
 
 
 ###
-PUT http://localhost:5000/declarations/{1}
+PUT http://localhost:5000/declarations/1
 Content-Type: application/json
 
 {
