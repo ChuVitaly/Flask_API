@@ -1,3 +1,5 @@
+# Это для визуальной проверки
+
 from flask import Flask, render_template, request, redirect
 from pony import orm
 from pony.orm import Database
