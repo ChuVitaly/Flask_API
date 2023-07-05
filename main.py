@@ -1,3 +1,5 @@
+#  REST API (backend) для сайта объявлений.
+
 from flask import Flask, request, jsonify, json
 from pony.orm import Database, Required, db_session, select
 
