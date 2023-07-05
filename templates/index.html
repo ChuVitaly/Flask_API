@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список объявлений</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .ad {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .ad-title {
+            font-weight: bold;
+        }
+
+        .ad-description {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .ad-price {
+            color: #008000;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Список объявлений</h1>
+
+    {% for ad in ads %}
+        <div class="ad">
+            <div class="ad-title">{{ ad['title'] }}</div>
+            <div class="ad-description">{{ ad['description'] }}</div>
+            <div class="ad-price">Цена: {{ ad['price'] }} руб.</div>
+        </div>
+    {% endfor %}
+
+    <a href="/create_ad">Создать объявление</a>
+</body>
+</html>
