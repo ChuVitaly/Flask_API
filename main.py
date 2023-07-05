@@ -1,54 +1,71 @@
-from flask import Flask, jsonify, request
+from flask import Flask, request, jsonify, json
+from pony.orm import Database, Required, db_session, select
+
+db = Database()
+
+
+class Declaration(db.Entity):
+    title = Required(str)
+    description = Required(str)
+    author = Required(str)
+    created_at = Required(str)
+
+
+db.bind(provider='sqlite', filename='database.sqlite', create_db=True)
+db.generate_mapping(create_tables=True)
 
 app = Flask(__name__)
 
-# Фейковая база данных для объявлений
-ads_database = [
-    {'id': 1, 'title': 'Продам автомобиль', 'description': 'Отличный автомобиль, 100000 км пробега', 'price': '50000'},
-    {'id': 2, 'title': 'Продам ноутбук', 'description': 'Мощный ноутбук, отличное состояние', 'price': '800'},
-    {'id': 3, 'title': 'Сдам квартиру', 'description': 'Уютная квартира в центре города', 'price': '20000'},
-    # Дополнительные объявления можно добавить здесь
-]
+
+@app.route('/declarations', methods=['GET'])
+@db_session
+def get_declarations():
+    ads = select(a for a in Declaration)[:]
+    response_data = {'declarations': [ad.to_dict() for ad in ads]}
+    response = app.response_class(
+        response=json.dumps(response_data, ensure_ascii=False),
+        status=200,
+        mimetype='application/json; charset=utf-8'
+    )
+    return response
 
 
-# Получение списка всех объявлений
-@app.route('/ads', methods=['GET'])
-def get_all_ads():
-    return jsonify(ads_database)
+@app.route('/declarations', methods=['POST'])
+@db_session
+def create_declaration():
+    data = request.json
+    ad = Declaration(
+        title=data['title'],
+        description=data['description'],
+        author=data['author'],
+        created_at=data['created_at']
+    )
+    return jsonify({'message': 'Обьявление создано успешно'})
 
 
-# Получение конкретного объявления по ID
-@app.route('/ads/<int:ad_id>', methods=['GET'])
-def get_ad(ad_id):
-    ad = next((ad for ad in ads_database if ad['id'] == ad_id), None)
-    if ad:
-        return jsonify(ad)
-    return jsonify({'message': 'Объявление не найдено'}), 404
+@app.route('/declarations/<int:ad_id>', methods=['PUT'])
+@db_session
+def update_declaration(ad_id):
+    data = request.json
+    ad = Declaration.get(id=ad_id)
+    if not ad:
+        return jsonify({'error': 'Обьявление не найдено'})
+    ad.title = data['title']
+    ad.description = data['description']
+    ad.author = data['author']
+    ad.created_at = data['created_at']
+    return jsonify({'message': 'Обьявление обновлено'})
 
 
-# Создание нового объявления
-@app.route('/ads', methods=['POST'])
-def create_ad():
-    data = request.get_json()
-    title = data.get('title')
-    description = data.get('description')
-    price = data.get('price')
-    if title and description and price:
-        new_ad = {'id': len(ads_database) + 1, 'title': title, 'description': description, 'price': price}
-        ads_database.append(new_ad)
-        return jsonify(new_ad), 201
-    return jsonify({'message': 'Не удалось создать объявление'}), 400
-
-
-# Удаление объявления по ID
-@app.route('/ads/<int:ad_id>', methods=['DELETE'])
-def delete_ad(ad_id):
-    ad = next((ad for ad in ads_database if ad['id'] == ad_id), None)
-    if ad:
-        ads_database.remove(ad)
-        return jsonify({'message': 'Объявление успешно удалено'})
-    return jsonify({'message': 'Объявление не найдено'}), 404
+@app.route('/declaration/<int:ad_id>', methods=['DELETE'])
+@db_session
+def delete_declaration(ad_id):
+    ad = Declaration.get(id=ad_id)
+    if not ad:
+        return jsonify({'error': 'Обьявление не найдено'})
+    ad.delete()
+    return jsonify({'message': 'Обьявление удалено'})
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

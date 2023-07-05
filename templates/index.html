@@ -26,7 +26,12 @@
             margin-top: 5px;
         }
 
-        .ad-price {
+        .ad-author {
+            color: #008000;
+            margin-top: 10px;
+        }
+
+        .ad-created_at {
             color: #008000;
             margin-top: 10px;
         }
@@ -37,9 +42,10 @@
 
     {% for ad in ads %}
         <div class="ad">
-            <div class="ad-title">{{ ad['title'] }}</div>
-            <div class="ad-description">{{ ad['description'] }}</div>
-            <div class="ad-price">Цена: {{ ad['price'] }} руб.</div>
+            <div class="ad-title">Заголовок: {{ ad['title'] }}</div>
+            <div class="ad-description">Описание: {{ ad['description'] }}</div>
+            <div class="ad-author">Автор: {{ ad['author'] }} </div>
+            <p class="ad-created_at">Дата публикации: {{ ad['created_at']}} </p>
         </div>
     {% endfor %}
 
